@@ -162,7 +162,6 @@ Immediately escalate Critical incidents and prioritize dedicated response resour
 
 ### Alerts & Recommendations
 ![M4.4 Alerts & Recommendations](./screenshots/m4_4_alerts_recommendations.png)
-
 ## Tools & Technologies
 
 - Power BI
