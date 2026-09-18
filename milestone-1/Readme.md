@@ -482,25 +482,9 @@ The dimensional structure provides a consistent foundation for the cybersecurity
 
 ---
 
-# 16. Project Structure
 
-    milestone-1/
-    │
-    ├── README.md
-    │
-    ├── screenshots/
-    │   ├── m1_raw_data.png
-    │   ├── m1_cleaned_data.png
-    │   └── m1_star_schema.png
-    │
-    └── scripts/
-        └── 1_clean_data.py
 
-> Update the screenshot filenames if the actual files uploaded to the repository use different names.
-
----
-
-# 17. Milestone 1 Outcome
+# 16. Milestone 1 Outcome
 
 Milestone 1 establishes the data and modeling foundation for the cybersecurity analytics project.
 
