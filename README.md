@@ -513,30 +513,29 @@ Milestone 4 integrates risk classification, executive KPIs, predictive analytics
 # Repository Structure
 
 ```text
+
 Cyber_threat_analytics/
 │
-├── README.md
+├── Risk_Intelligence_Executive_Analy...   ← Power BI .pbix file
 │
 ├── milestone-1/
-│   ├── README.md
-│   ├── scripts/
-│   │   └── 1_clean_data.py
-│   └── screenshots/
+│   ├── Scripts/
+│   │   ├── India_Cybersecurity_Incident_...
+│   │   ├── clean_data.csv
+│   │   └── data_processing.py
+│   └── Readme.md
 │
 ├── milestone-2/
-│   ├── README.md
-│   └── screenshots/
+│   ├── screenshots/
+│   └── README.md
 │
 ├── milestone-3/
-│   ├── README.md
-│   └── screenshots/
+│   ├── screenshots/
+│   └── Readme.md
 │
-├── milestone-4/
-│   ├── README.md
-│   └── screenshots/
-│
-└── M4_Risk_Intelligence_Executive_Analytics.pbix
-```
+└── milestone-4/
+    ├── screenshots/
+    └── README.md
 
 ---
 
