@@ -8,7 +8,6 @@ This milestone focuses on preparing the cybersecurity incident dataset for analy
 
 The resulting cleaned dataset and data warehouse model provide the foundation for the subsequent cybersecurity analytics milestones.
 
----
 
 ## 1. Dataset
 
