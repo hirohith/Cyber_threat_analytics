@@ -370,84 +370,69 @@ The four dimension tables are connected to the fact table using **one-to-many (1
 
 | Dimension Table | Key | Fact Table Key | Relationship |
 |---|---|---|---|
-| `Dim_Date` | `Date_Key` | `Date_Key` | 1 : * |
-| `Dim_Location` | `Location_Key` | `Location_Key` | 1 : * |
-| `Dim_Threat` | `Threat_Key` | `Threat_Key` | 1 : * |
-| `Dim_Operational` | `Operational_Key` | `Operational_Key` | 1 : * |
+| `Dim_Date` | `Date_Key` | `Date_Key` | 1:* |
+| `Dim_Location` | `Location_Key` | `Location_Key` | 1:* |
+| `Dim_Threat` | `Threat_Key` | `Threat_Key` | 1:* |
+| `Dim_Operational` | `Operational_Key` | `Operational_Key` | 1:* |
 
 The dimension tables are on the **one (1) side**, while `Fact_Incident` is on the **many (*) side**.
 
-### Star Schema Structure
+## Star Schema Structure
 
 ```text
                          ┌─────────────────────┐
-                         │      Dim_Threat     │
+                         │     Dim_Threat      │
                          │─────────────────────│
                          │ Threat_Key          │
                          │ Attack_Type         │
                          │ Attack_Severity     │
-                         │ Threat_Severity     │
                          │ Target_System       │
+                         │ Threat_Severity     │
                          └──────────┬──────────┘
                                     │ 1
                                     │
                                     │ *
-                         ┌──────────▼──────────┐
-                         │    Fact_Incident    │
-                         │─────────────────────│
-                         │ Incident_ID         │
-                         │ Date_Key            │
-                         │ Location_Key        │
-                         │ Threat_Key          │
-                         │ Operational_Key     │
-                         │ Affected_Users      │
-                         │ Attack_Duration_Min │
-                         │ Data_Compromised_GB │
-                         │ Financial_Loss_INR  │
-                         │ Response_Time_Min   │
-                         │ Data_Norm           │
-                         │ Loss_Norm            │
-                         │ Response_Norm       │
-                         │ Risk_Level          │
-                         │ Risk_Level_4        │
-                         └──────┬────────┬──────┘
-                                │        │
-                              * │        │ *
-                                │        │
-                           1    │        │    1
-                  ┌─────────────┘        └─────────────┐
-                  │                                    │
-       ┌──────────▼───────────┐          ┌─────────────▼──────────┐
-       │     Dim_Location     │          │    Dim_Operational     │
-       │──────────────────────│          │────────────────────────│
-       │ Location_Key         │          │ Operational_Key        │
-       │ City                 │          │ Security_Tools_Used    │
-       │ State                │          │ Mitigation_Method       │
-       │ Industry             │          │ Outcome                 │
-       │ Organization         │          │ Reporting_Agency        │
-       └──────────────────────┘          └─────────────────────────┘
+┌─────────────────────┐             ▼
+│    Dim_Location     │      ┌─────────────────────┐
+│─────────────────────│      │    Fact_Incident    │
+│ Location_Key        │──1:* │─────────────────────│
+│ City                │      │ Incident_ID         │
+│ Industry            │      │ Date_Key            │
+│ Organization        │      │ Location_Key        │
+│ State               │      │ Threat_Key          │
+└─────────────────────┘      │ Operational_Key     │
+                             │ Affected_Users      │
+                             │ Attack_Duration_Min │
+                             │ Data_Compromised_GB │
+                             │ Financial_Loss_INR  │
+                             │ Response_Time_Min   │
+                             │ Loss_Norm           │
+                             │ Response_Norm       │
+                             │ Risk_Level          │
+                             │ Risk_Level_4        │
+                             └───────┬─────────┬─────┘
+                                     │         │
+                                    *│         │*
+                                     │         │
+                                     │         │1
+                                     ▼         ▼
+                         ┌─────────────────┐  ┌─────────────────────┐
+                         │    Dim_Date     │  │  Dim_Operational    │
+                         │─────────────────│  │─────────────────────│
+                         │ Date_Key        │  │ Operational_Key     │
+                         │ Date            │  │ Mitigation_Method   │
+                         │ Month           │  │ Outcome             │
+                         │ Month_Name      │  │ Reporting_Agency    │
+                         │ Quarter         │  │ Security_Tools_Used │
+                         │ Year            │  └─────────────────────┘
+                         └─────────────────┘
+```
 
-                         ┌─────────────────────┐
-                         │       Dim_Date      │
-                         │─────────────────────│
-                         │ Date_Key            │
-                         │ Date                │
-                         │ Month               │
-                         │ Month_Name          │
-                         │ Quarter             │
-                         │ Year                │
-                         └──────────┬──────────┘
-                                    │ 1
-                                    │
-                                    │ *
-                                    ▼
-                              Fact_Incident
-### Star Schema Interpretation
+## Star Schema Interpretation
 
 The `Fact_Incident` table contains measurable incident-level information, while the dimension tables provide descriptive context for filtering, grouping, aggregation, and drill-down analysis.
 
 This structure separates **measures** from **descriptive attributes**, making the model easier to analyze and maintain.
-The `Fact_Incident` table contains measurable incident-level information, while the dimension tables provide descriptive context for filtering, grouping, aggregation, and drill-down analysis.
 
 # 13. Power BI Integration
 
@@ -471,38 +456,27 @@ The model supports analysis across the following areas:
 
 - **Attack Classification**
   - Attack type analysis
-  - Target system analysis
   - Attack severity analysis
-
-- **Threat Analysis**
   - Threat severity analysis
-  - Classification of different cybersecurity threats
 
-- **Security Operations**
+- **Operational Analysis**
   - Security tools used
+  - Target systems
   - Mitigation methods
-  - Incident outcomes
-  - Reporting agencies
+  - User roles
 
 - **Incident Impact**
-  - Affected users
   - Financial loss
   - Data compromised
+  - Affected users
   - Attack duration
 
 - **Response Performance**
   - Response time analysis
-  - Normalized response performance
+  - Response performance by location
+  - Operational response analysis
 
-- **Risk Analysis**
-  - Risk level analysis
-  - Risk-level categorization
-  - Derived risk indicators
-
-The dimensional structure provides a consistent foundation for Power BI dashboards, KPI analysis, filtering, aggregation, and drill-down analysis.
-
----
-
+The dimensional structure provides a consistent foundation for the cybersecurity dashboards developed in subsequent milestones.
 # 14. Data Model Relationships
 
 The Power BI data model uses **one-to-many (1:*) relationships** between the dimension tables and the central `Fact_Incident` table.
