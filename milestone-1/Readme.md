@@ -241,200 +241,334 @@ These features provide the analytical foundation for subsequent cybersecurity an
 
 A dimensional data warehouse was designed to support cybersecurity analytics and Power BI reporting.
 
-The model follows a **Star Schema** architecture consisting of:
+The data warehouse follows a **Star Schema** architecture consisting of:
 
 - One central fact table
-- Time dimension
-- Location dimension
-- Threat dimension
-- Operational dimension
+- Four dimension tables:
+  - Date Dimension
+  - Location Dimension
+  - Threat Dimension
+  - Operational Dimension
+
+The **Fact_Incident** table is connected to each dimension through key columns using **one-to-many (1:*) relationships**.
 
 ---
 
 ## 10.1 Fact Table
 
-### `cybersecuritydw.fact_incident`
+### `Fact_Incident`
 
-The fact table acts as the central analytical table and stores incident-level measures together with foreign keys connecting the incident records to the relevant dimensions.
+The `Fact_Incident` table acts as the central analytical table and stores incident-level measures along with keys that connect each incident to the appropriate dimension.
 
-Key fields include:
+### Key Fields
 
 - `Incident_ID`
-- `Time_ID`
-- `Location_ID`
-- `Threat_ID`
-- `Operational_ID`
+- `Date_Key`
+- `Location_Key`
+- `Threat_Key`
+- `Operational_Key`
+
+### Incident Measures
+
+- `Affected_Users`
 - `Attack_Duration_Min`
 - `Data_Compromised_GB`
-- `Response_Time_Min`
 - `Financial_Loss_INR`
+- `Response_Time_Min`
 
-The fact table serves as the central source for analytical calculations and reporting.
+### Derived Analytical Fields
+
+- `Data_Norm`
+- `Loss_Norm`
+- `Response_Norm`
+- `Risk_Level`
+- `Risk_Level_4`
+
+The fact table serves as the central source for analytical calculations, risk analysis, incident impact measurement, and Power BI reporting.
 
 ---
 
 # 11. Dimension Tables
 
-## 11.1 Time Dimension
+## 11.1 Date Dimension
 
-### `cybersecuritydw.dim_time`
+### `Dim_Date`
 
-The time dimension provides temporal attributes for cybersecurity incident analysis.
+The Date dimension provides a structured time-based view of cybersecurity incidents.
 
-Key attributes include:
+### Key Attributes
 
-- `Time_ID`
-- `Timestamp`
+- `Date_Key`
 - `Date`
-- `Day`
 - `Month`
-- `Hour`
+- `Month_Name`
+- `Quarter`
 - `Year`
 
-This dimension supports time-based filtering and analysis.
+This dimension enables time-based filtering, aggregation, and trend analysis such as monthly, quarterly, and yearly incident patterns.
 
 ---
 
 ## 11.2 Location Dimension
 
-### `cybersecuritydw.dim_location`
+### `Dim_Location`
 
-The location dimension provides geographic and organizational context for cybersecurity incidents.
+The Location dimension provides geographic and organizational context for cybersecurity incidents.
 
-Key attributes include:
+### Key Attributes
 
-- `Location_ID`
-- `Location`
-- `State`
+- `Location_Key`
 - `City`
+- `State`
 - `Industry`
+- `Organization`
 
-This dimension supports geographic and location-based cybersecurity analysis.
+This dimension enables analysis of cybersecurity incidents across different cities, states, industries, and organizations.
 
 ---
 
 ## 11.3 Threat Dimension
 
-### `cybersecuritydw.dim_threat`
+### `Dim_Threat`
 
-The threat dimension organizes cybersecurity threat classifications.
+The Threat dimension contains descriptive information about the type and severity of cybersecurity threats.
 
-Key attributes include:
+### Key Attributes
 
-- `Threat_ID`
+- `Threat_Key`
 - `Attack_Type`
 - `Attack_Severity`
 - `Threat_Severity`
+- `Target_System`
 
-This dimension supports threat classification and severity analysis.
+This dimension supports analysis of attack classifications, severity levels, and affected target systems.
 
 ---
 
 ## 11.4 Operational Dimension
 
-### `cybersecuritydw.dim_operational`
+### `Dim_Operational`
 
-The operational dimension stores operational and incident-response-related attributes.
+The Operational dimension stores information related to cybersecurity incident handling and response.
 
-Key attributes include:
+### Key Attributes
 
-- `Operational_ID`
+- `Operational_Key`
 - `Security_Tools_Used`
-- `Target_System`
-- `User_Role`
 - `Mitigation_Method`
+- `Outcome`
+- `Reporting_Agency`
 
-This dimension supports analysis of cybersecurity operations and incident response.
+This dimension supports analysis of security tools, mitigation methods, incident outcomes, and reporting agencies.
 
 ---
 
 # 12. Star Schema Architecture
 
-The dimensional model is organized around the central incident fact table.
+The dimensional model is organized around the central `Fact_Incident` table.
 
-    ┌─────────────────────┐
-    │      dim_time       │
-    │---------------------│
-    │ Time_ID             │
-    │ Date                │
-    │ Day                 │
-    │ Month               │
-    │ Hour                │
-    │ Year                │
-    └──────────┬──────────┘
-               │
-               │
-    ┌─────────────────────┐
-    │    dim_location     │
-    │---------------------│
-    │ Location_ID         │
-    │ Location            │
-    │ State               │
-    │ City                │
-    │ Industry            │
-    └──────────┬──────────┘
-               │
-               │
-               ▼
-    ┌─────────────────────┐
-    │   fact_incident     │
-    │---------------------│
-    │ Incident_ID         │
-    │ Time_ID             │
-    │ Location_ID         │
-    │ Threat_ID           │
-    │ Operational_ID      │
-    │ Financial_Loss_INR  │
-    │ Response_Time_Min   │
-    │ Data_Compromised_GB │
-    │ Attack_Duration_Min │
-    └──────┬────────┬─────┘
-           │        │
-           │        │
-           │        ▼
-           │   ┌─────────────────────┐
-           │   │     dim_threat      │
-           │   │---------------------│
-           │   │ Threat_ID           │
-           │   │ Attack_Type         │
-           │   │ Attack_Severity     │
-           │   │ Threat_Severity     │
-           │   └─────────────────────┘
-           │
-           ▼
-    ┌─────────────────────┐
-    │  dim_operational    │
-    │---------------------│
-    │ Operational_ID      │
-    │ Security_Tools_Used │
-    │ Target_System       │
-    │ User_Role           │
-    │ Mitigation_Method   │
-    └─────────────────────┘
+The four dimension tables are connected to the fact table using **one-to-many (1:*) relationships**:
 
-The fact table provides measurable incident data, while the dimension tables provide descriptive context for filtering, grouping, and drill-down analysis.
+| Dimension Table | Key | Fact Table Key | Relationship |
+|---|---|---|---|
+| `Dim_Date` | `Date_Key` | `Date_Key` | 1 : * |
+| `Dim_Location` | `Location_Key` | `Location_Key` | 1 : * |
+| `Dim_Threat` | `Threat_Key` | `Threat_Key` | 1 : * |
+| `Dim_Operational` | `Operational_Key` | `Operational_Key` | 1 : * |
+
+The dimension tables are on the **one (1) side**, while `Fact_Incident` is on the **many (*) side**.
+
+### Star Schema Structure
+
+```text
+                         ┌─────────────────────┐
+                         │      Dim_Threat     │
+                         │─────────────────────│
+                         │ Threat_Key          │
+                         │ Attack_Type         │
+                         │ Attack_Severity     │
+                         │ Threat_Severity     │
+                         │ Target_System       │
+                         └──────────┬──────────┘
+                                    │ 1
+                                    │
+                                    │ *
+                         ┌──────────▼──────────┐
+                         │    Fact_Incident    │
+                         │─────────────────────│
+                         │ Incident_ID         │
+                         │ Date_Key            │
+                         │ Location_Key        │
+                         │ Threat_Key          │
+                         │ Operational_Key     │
+                         │ Affected_Users      │
+                         │ Attack_Duration_Min │
+                         │ Data_Compromised_GB │
+                         │ Financial_Loss_INR  │
+                         │ Response_Time_Min   │
+                         │ Data_Norm           │
+                         │ Loss_Norm            │
+                         │ Response_Norm       │
+                         │ Risk_Level          │
+                         │ Risk_Level_4        │
+                         └──────┬────────┬──────┘
+                                │        │
+                              * │        │ *
+                                │        │
+                           1    │        │    1
+                  ┌─────────────┘        └─────────────┐
+                  │                                    │
+       ┌──────────▼───────────┐          ┌─────────────▼──────────┐
+       │     Dim_Location     │          │    Dim_Operational     │
+       │──────────────────────│          │────────────────────────│
+       │ Location_Key         │          │ Operational_Key        │
+       │ City                 │          │ Security_Tools_Used    │
+       │ State                │          │ Mitigation_Method       │
+       │ Industry             │          │ Outcome                 │
+       │ Organization         │          │ Reporting_Agency        │
+       └──────────────────────┘          └─────────────────────────┘
+
+                         ┌─────────────────────┐
+                         │       Dim_Date      │
+                         │─────────────────────│
+                         │ Date_Key            │
+                         │ Date                │
+                         │ Month               │
+                         │ Month_Name          │
+                         │ Quarter             │
+                         │ Year                │
+                         └──────────┬──────────┘
+                                    │ 1
+                                    │
+                                    │ *
+                                    ▼
+                              Fact_Incident
+The Fact_Incident table contains measurable incident-level information, while the dimension tables provide descriptive context for filtering, grouping, aggregation, and drill-down analysis.
+
+This structure separates measures from descriptive attributes, making the model easier to analyze and maintain.
 
 ---
-
 # 13. Power BI Integration
 
-The Star Schema provides the data-model foundation for Power BI analytics.
+The Star Schema provides the data-model foundation for Power BI cybersecurity analytics.
 
-The model supports analysis across:
+The model supports analysis across the following areas:
 
-- Time
-- Geography
-- Attack classification
-- Threat severity
-- Security operations
-- Incident impact
-- Response performance
+- **Time Analysis**
+  - Daily incident trends
+  - Monthly incident trends
+  - Quarterly and yearly analysis
 
-The dimensional structure provides a consistent foundation for the cybersecurity dashboards developed in subsequent milestones.
+- **Geographical Analysis**
+  - City-wise incidents
+  - State-wise incidents
+  - Organization-wise incidents
+
+- **Industry Analysis**
+  - Incident distribution by industry
+  - Comparison of cybersecurity incidents across industries
+
+- **Attack Classification**
+  - Attack type analysis
+  - Target system analysis
+  - Attack severity analysis
+
+- **Threat Analysis**
+  - Threat severity analysis
+  - Classification of different cybersecurity threats
+
+- **Security Operations**
+  - Security tools used
+  - Mitigation methods
+  - Incident outcomes
+  - Reporting agencies
+
+- **Incident Impact**
+  - Affected users
+  - Financial loss
+  - Data compromised
+  - Attack duration
+
+- **Response Performance**
+  - Response time analysis
+  - Normalized response performance
+
+- **Risk Analysis**
+  - Risk level analysis
+  - Risk-level categorization
+  - Derived risk indicators
+
+The dimensional structure provides a consistent foundation for Power BI dashboards, KPI analysis, filtering, aggregation, and drill-down analysis.
 
 ---
 
-# 14. Milestone 1 Deliverables
+# 14. Data Model Relationships
+
+The Power BI data model uses **one-to-many (1:*) relationships** between the dimension tables and the central `Fact_Incident` table.
+
+| Dimension | Dimension Key | Fact Key | Cardinality | Cross-Filter |
+|---|---|---|---|---|
+| `Dim_Date` | `Date_Key` | `Date_Key` | 1 : * | Single |
+| `Dim_Location` | `Location_Key` | `Location_Key` | 1 : * | Single |
+| `Dim_Threat` | `Threat_Key` | `Threat_Key` | 1 : * | Single |
+| `Dim_Operational` | `Operational_Key` | `Operational_Key` | 1 : * | Single |
+
+The dimension tables contain unique key values, while the corresponding keys in `Fact_Incident` can occur across multiple incident records.
+
+This relationship structure allows filters applied to dimension tables to propagate to the related incident records in the fact table.
+
+---
+
+# 15. Analytical Structure
+
+The updated Star Schema separates the data into two major components:
+
+### Fact Table
+
+`Fact_Incident` stores the measurable incident-level information used for calculations and KPIs.
+
+Examples include:
+
+- Financial loss
+- Response time
+- Attack duration
+- Data compromised
+- Affected users
+- Risk levels
+- Normalized analytical measures
+
+### Dimension Tables
+
+The dimension tables provide descriptive context for the incident records.
+
+| Dimension | Purpose |
+|---|---|
+| `Dim_Date` | Time-based analysis |
+| `Dim_Location` | Geographic and organizational analysis |
+| `Dim_Threat` | Threat and attack classification |
+| `Dim_Operational` | Security operations and response analysis |
+
+This structure allows the same incident measures to be analyzed from multiple perspectives without duplicating the underlying fact data.
+
+---
+
+# 16. Benefits of the Star Schema
+
+The updated dimensional model provides the following benefits:
+
+- Simplifies Power BI data modeling
+- Provides clear separation between facts and dimensions
+- Enables efficient filtering and aggregation
+- Supports drill-down analysis
+- Enables time-based trend analysis
+- Supports geographical and industry-level analysis
+- Supports threat and attack classification
+- Enables operational and response analysis
+- Provides a structured foundation for KPI development
+- Supports risk and incident-impact analysis
+
+The Star Schema therefore provides the structural foundation for the cybersecurity analytics and reporting layer developed in Power BI.
+# 17. Milestone 1 Deliverables
 
 ## Data Preparation
 
@@ -469,7 +603,7 @@ The dimensional structure provides a consistent foundation for the cybersecurity
 
 ---
 
-# 15. Tools & Technologies
+# 18. Tools & Technologies
 
 | Technology | Purpose |
 |---|---|
@@ -484,7 +618,7 @@ The dimensional structure provides a consistent foundation for the cybersecurity
 
 
 
-# 16. Milestone 1 Outcome
+# 19. Milestone 1 Outcome
 
 Milestone 1 establishes the data and modeling foundation for the cybersecurity analytics project.
 
