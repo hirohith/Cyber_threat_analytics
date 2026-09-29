@@ -442,10 +442,9 @@ The dimension tables are on the **one (1) side**, while `Fact_Incident` is on th
                                     │ *
                                     ▼
                               Fact_Incident
-The Fact_Incident table contains measurable incident-level information, while the dimension tables provide descriptive context for filtering, grouping, aggregation, and drill-down analysis.
+The `Fact_Incident` table contains measurable incident-level information, while the dimension tables provide descriptive context for filtering, grouping, aggregation, and drill-down analysis.
 
-This structure separates measures from descriptive attributes, making the model easier to analyze and maintain.
-
+This structure separates **measures** from **descriptive attributes**, making the model easier to analyze and maintain.
 ---
 # 13. Power BI Integration
 
